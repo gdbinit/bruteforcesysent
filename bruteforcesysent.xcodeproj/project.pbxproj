@@ -1,0 +1,211 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		DE24DD0814E9BEA60071393F /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = DE24DD0714E9BEA60071393F /* main.c */; };
+		DE24DD1114E9BECE0071393F /* sysent.c in Sources */ = {isa = PBXBuildFile; fileRef = DE24DD0F14E9BECE0071393F /* sysent.c */; };
+		DE24DD1C14E9F7D20071393F /* idt.c in Sources */ = {isa = PBXBuildFile; fileRef = DE24DD1A14E9F7D20071393F /* idt.c */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		DE24DD0114E9BEA50071393F /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		DE24DD0314E9BEA50071393F /* bruteforcesysent */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = bruteforcesysent; sourceTree = BUILT_PRODUCTS_DIR; };
+		DE24DD0714E9BEA60071393F /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		DE24DD0F14E9BECE0071393F /* sysent.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sysent.c; sourceTree = "<group>"; };
+		DE24DD1014E9BECE0071393F /* sysent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sysent.h; sourceTree = "<group>"; };
+		DE24DD1A14E9F7D20071393F /* idt.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = idt.c; sourceTree = "<group>"; };
+		DE24DD1B14E9F7D20071393F /* idt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = idt.h; sourceTree = "<group>"; };
+		DE24DD1E14E9F9330071393F /* main.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		DE24DD0014E9BEA50071393F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		DE24DCF814E9BEA50071393F = {
+			isa = PBXGroup;
+			children = (
+				DE24DD0614E9BEA50071393F /* bruteforcesysent */,
+				DE24DD0414E9BEA50071393F /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		DE24DD0414E9BEA50071393F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				DE24DD0314E9BEA50071393F /* bruteforcesysent */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DE24DD0614E9BEA50071393F /* bruteforcesysent */ = {
+			isa = PBXGroup;
+			children = (
+				DE24DD0714E9BEA60071393F /* main.c */,
+				DE24DD1E14E9F9330071393F /* main.h */,
+				DE24DD0F14E9BECE0071393F /* sysent.c */,
+				DE24DD1014E9BECE0071393F /* sysent.h */,
+				DE24DD1A14E9F7D20071393F /* idt.c */,
+				DE24DD1B14E9F7D20071393F /* idt.h */,
+			);
+			path = bruteforcesysent;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		DE24DD0214E9BEA50071393F /* bruteforcesysent */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DE24DD0C14E9BEA60071393F /* Build configuration list for PBXNativeTarget "bruteforcesysent" */;
+			buildPhases = (
+				DE24DCFF14E9BEA50071393F /* Sources */,
+				DE24DD0014E9BEA50071393F /* Frameworks */,
+				DE24DD0114E9BEA50071393F /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = bruteforcesysent;
+			productName = bruteforcesysent;
+			productReference = DE24DD0314E9BEA50071393F /* bruteforcesysent */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		DE24DCFA14E9BEA50071393F /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = DE24DCFD14E9BEA50071393F /* Build configuration list for PBXProject "bruteforcesysent" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = DE24DCF814E9BEA50071393F;
+			productRefGroup = DE24DD0414E9BEA50071393F /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				DE24DD0214E9BEA50071393F /* bruteforcesysent */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		DE24DCFF14E9BEA50071393F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DE24DD0814E9BEA60071393F /* main.c in Sources */,
+				DE24DD1114E9BECE0071393F /* sysent.c in Sources */,
+				DE24DD1C14E9F7D20071393F /* idt.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		DE24DD0A14E9BEA60071393F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		DE24DD0B14E9BEA60071393F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		DE24DD0D14E9BEA60071393F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		DE24DD0E14E9BEA60071393F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		DE24DCFD14E9BEA50071393F /* Build configuration list for PBXProject "bruteforcesysent" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DE24DD0A14E9BEA60071393F /* Debug */,
+				DE24DD0B14E9BEA60071393F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DE24DD0C14E9BEA60071393F /* Build configuration list for PBXNativeTarget "bruteforcesysent" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DE24DD0D14E9BEA60071393F /* Debug */,
+				DE24DD0E14E9BEA60071393F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = DE24DCFA14E9BEA50071393F /* Project object */;
+}
