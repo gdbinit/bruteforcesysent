@@ -95,6 +95,9 @@ find_kernel_base(const uint64_t int80_address)
                                 // we can read smaller values to avoid overlapping
                 length = sizeof(struct mach_header_64) + sizeof(struct segment_command_64);
             }
+            // check for int overflow
+            if (temp_address - step_value > temp_address)
+                break;
             temp_address -= step_value;
         }           
     }
@@ -121,6 +124,9 @@ find_kernel_base(const uint64_t int80_address)
                 step_value = 1;
                 length = sizeof(struct mach_header) + sizeof(struct segment_command);
             }
+            // check for it overflow
+            if (temp_address - step_value > temp_address)
+                break;
             temp_address -= step_value;
         }
     }

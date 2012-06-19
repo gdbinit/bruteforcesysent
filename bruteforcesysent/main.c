@@ -93,6 +93,11 @@ int main(int argc, char ** argv)
     uint64_t int80_address = calculate_int80address(idt_address);
     
     uint64_t kernel_base    = find_kernel_base(int80_address);
+    if (kernel_base == 0)
+    {
+        fprintf(stderr, "[ERROR] Could not find kernel base address!\n");
+        exit(1);
+    }
     uint64_t data_address   = 0;
     uint64_t data_size      = 0;
     
