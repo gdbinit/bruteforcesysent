@@ -44,6 +44,7 @@ struct sysent64 {		/* system call table */
 	int16_t		sy_narg;	/* number of args */
 	int8_t		sy_resv;	/* reserved  */
 	int8_t		sy_flags;	/* flags */
+    uint32_t    padding;        /* padding, x86 binary against 64bits kernel would fail */
 	uint64_t	sy_call;	/* implementing function */
 	uint64_t	sy_arg_munge32; /* system call arguments munger for 32-bit process */
 	uint64_t	sy_arg_munge64; /* system call arguments munger for 64-bit process */
