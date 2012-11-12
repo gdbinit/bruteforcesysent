@@ -20,18 +20,26 @@
  *
  */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/sysctl.h>
+
 #include "idt.h"
 
 // retrieve the base address for the IDT
 idt_t
-get_addr_idt (void)
+get_addr_idt (uint8_t kernel_type)
 {
+#if DEBUG
+    printf("[DEBUG] Executing %s\n", __FUNCTION__);
+#endif
 	// allocate enough space for 32 and 64 bits addresses
 	uint8_t idtr[10];
 	idt_t idt = 0;
     
 	__asm__ volatile ("sidt %0": "=m" (idtr));
-	switch (get_kernel_type()) {
+	switch (kernel_type) {
 		case 0:
 			idt = *((uint32_t *) &idtr[2]);
 			break;
@@ -46,9 +54,12 @@ get_addr_idt (void)
 }
 
 // retrieve which kernel type are we running, 32 or 64 bits
-int8_t 
+int8_t
 get_kernel_type (void)
 {
+#if DEBUG
+    printf("[DEBUG] Executing %s\n", __FUNCTION__);
+#endif
 	size_t size = 0;
     int8_t retValue = 0;
 	sysctlbyname("hw.machine", NULL, &size, NULL, 0);

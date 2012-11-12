@@ -31,7 +31,6 @@
 		DE24DD1014E9BECE0071393F /* sysent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sysent.h; sourceTree = "<group>"; };
 		DE24DD1A14E9F7D20071393F /* idt.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = idt.c; sourceTree = "<group>"; };
 		DE24DD1B14E9F7D20071393F /* idt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = idt.h; sourceTree = "<group>"; };
-		DE24DD1E14E9F9330071393F /* main.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,7 +64,6 @@
 			isa = PBXGroup;
 			children = (
 				DE24DD0714E9BEA60071393F /* main.c */,
-				DE24DD1E14E9F9330071393F /* main.h */,
 				DE24DD0F14E9BECE0071393F /* sysent.c */,
 				DE24DD1014E9BECE0071393F /* sysent.h */,
 				DE24DD1A14E9F7D20071393F /* idt.c */,
@@ -99,6 +97,9 @@
 /* Begin PBXProject section */
 		DE24DCFA14E9BEA50071393F /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0420;
+			};
 			buildConfigurationList = DE24DCFD14E9BEA50071393F /* Build configuration list for PBXProject "bruteforcesysent" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
@@ -169,6 +170,7 @@
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=0";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;

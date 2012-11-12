@@ -27,32 +27,47 @@
  * add kmem=1 parameter, and reboot!
  *
  * v0.1 - Initial version, 32 and 64 bits support
+ * v0.2 - Bug fixing and code cleanup
  *
  */
 
-#include "main.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <string.h>
+#include <stdint.h>
+#include "idt.h"
+#include "sysent.h"
 
-#define VERSION "0.1"
+#define VERSION "0.2"
 
 int32_t fd_kmem;
+static void header(void);
+int8_t readkmem(const uint32_t fd, void *buffer, const uint64_t offset, const size_t size);
 
 int8_t
 readkmem(const uint32_t fd, void *buffer, const uint64_t offset, const size_t size)
 {
+#if DEBUG
+    printf("[DEBUG] Executing %s\n", __FUNCTION__);
+#endif
 	if(lseek(fd, offset, SEEK_SET) != offset)
 	{
 		fprintf(stderr,"[ERROR] Error in lseek. Are you root? \n");
 		return(-1);
 	}
-	if(read(fd, buffer, size) != size)
+    ssize_t bytes_read = read(fd, buffer, size);
+	if(bytes_read != size)
 	{
-		fprintf(stderr,"[ERROR] Error while trying to read from kmem\n");
+		fprintf(stderr,"[ERROR] Error while trying to read from kmem. Asked %ld bytes from offset %llx, returned %ld.\n", size, offset, bytes_read);
 		return(-2);
 	}
     return(0);
 }
 
-void header(void)
+static void
+header(void)
 {
     printf(" _____         _       _____                 \n");
     printf("| __  |___ _ _| |_ ___|   __|___ ___ ___ ___ \n");
@@ -62,7 +77,8 @@ void header(void)
 	printf("---------------------------------------------\n");
 }
 
-int main(int argc, char ** argv)
+int
+main(int argc, char ** argv)
 {
     	
 	header();
@@ -81,7 +97,7 @@ int main(int argc, char ** argv)
 		exit(1);
 	}
 	
-	if(!(fd_kmem = open("/dev/kmem",O_RDWR)))
+	if((fd_kmem = open("/dev/kmem",O_RDWR)) == -1)
 	{
 		fprintf(stderr,"[ERROR] Error while opening /dev/kmem. Is /dev/kmem enabled?\n");
 		fprintf(stderr,"Add parameter kmem=1 to /Library/Preferences/SystemConfiguration/com.apple.Boot.plist\n");
@@ -89,17 +105,17 @@ int main(int argc, char ** argv)
 	}
 	    
 	// retrieve int80 address
-    idt_t idt_address = get_addr_idt();
-    uint64_t int80_address = calculate_int80address(idt_address);
+    idt_t idt_address = get_addr_idt(kernel_type);
+    uint64_t int80_address = calculate_int80address(idt_address, kernel_type);
     
-    uint64_t kernel_base    = find_kernel_base(int80_address);
+    uint64_t kernel_base = find_kernel_base(int80_address, kernel_type);
     if (kernel_base == 0)
     {
         fprintf(stderr, "[ERROR] Could not find kernel base address!\n");
         exit(1);
     }
-    uint64_t data_address   = 0;
-    uint64_t data_size      = 0;
+    uint64_t data_address = 0;
+    uint64_t data_size    = 0;
     
     process_header(kernel_base, &data_address, &data_size);
     

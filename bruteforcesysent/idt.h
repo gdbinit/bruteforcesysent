@@ -20,14 +20,15 @@
  *
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#ifndef _idt_h_
+#define _idt_h_
+
 #include <stdint.h>
-#include <sys/sysctl.h>
 
 typedef uint64_t idt_t;
 
 // prototypes
 int8_t get_kernel_type (void);
-idt_t  get_addr_idt (void);
+idt_t  get_addr_idt (uint8_t kernel_type);
+
+#endif

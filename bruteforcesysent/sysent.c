@@ -19,16 +19,23 @@
  * sysent.c
  *
  */
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <mach-o/loader.h>
 
 #include "sysent.h"
-
-#define DEBUG 1
+#include "idt.h"
 
 extern int32_t fd_kmem;
+extern int8_t readkmem(const uint32_t fd, void *buffer, const uint64_t offset, const size_t size);
 
 uint64_t 
-calculate_int80address(const uint64_t idt_address)
+calculate_int80address(const uint64_t idt_address, uint8_t kernel_type)
 {
+#if DEBUG
+    printf("[DEBUG] Executing %s\n", __FUNCTION__);
+#endif
   	// find the address of interrupt 0x80 - EXCEP64_SPC_USR(0x80,hi64_unix_scall) @ osfmk/i386/idt64.s
 	struct descriptor_idt *int80_descriptor = NULL;
 	uint64_t int80_address = 0;
@@ -41,7 +48,7 @@ calculate_int80address(const uint64_t idt_address)
 	readkmem(fd_kmem, int80_descriptor, idt_address+sizeof(struct descriptor_idt)*0x80, sizeof(struct descriptor_idt));
 
     // we need to compute the address, it's not direct
-    if (get_kernel_type())
+    if (kernel_type)
     {
         // extract the stub address
         high = (unsigned long)int80_descriptor->offset_high << 32;
@@ -57,14 +64,16 @@ calculate_int80address(const uint64_t idt_address)
 }
 
 uint64_t 
-find_kernel_base(const uint64_t int80_address)
+find_kernel_base(const uint64_t int80_address, uint8_t kernel_type)
 {
+#if DEBUG
+    printf("[DEBUG] Executing %s\n", __FUNCTION__);
+#endif
     uint64_t temp_address   = int80_address;
     // the step amount to search backwards from int80
     uint16_t step_value     = 500; // step must be at least sizeof mach_header and a segment_command
     uint16_t length         = step_value;
     uint8_t *temp_buffer    = malloc(step_value);
-    uint8_t kernel_type     = get_kernel_type();
 
     if (kernel_type) // 64bits
     {
@@ -124,7 +133,7 @@ find_kernel_base(const uint64_t int80_address)
                 step_value = 1;
                 length = sizeof(struct mach_header) + sizeof(struct segment_command);
             }
-            // check for it overflow
+            // check for int overflow
             if (temp_address - step_value > temp_address)
                 break;
             temp_address -= step_value;
@@ -139,6 +148,9 @@ find_kernel_base(const uint64_t int80_address)
 uint8_t
 process_header(const uint64_t target_address, uint64_t *data_address, uint64_t *data_size)
 {
+#if DEBUG
+    printf("[DEBUG] Executing %s\n", __FUNCTION__);
+#endif
     uint8_t *header_buffer = malloc(1000);
     readkmem(fd_kmem, header_buffer, target_address, 1000);
     
@@ -169,8 +181,8 @@ process_header(const uint64_t target_address, uint64_t *data_address, uint64_t *
     
     // find the last command offset
     struct load_command *loadCommand = NULL;
-    uint32_t i = 0;
-    for (; i < nrLoadCmds; i++)
+    
+    for (uint32_t i = 0; i < nrLoadCmds; i++)
     {
         loadCommand = (struct load_command*)address;
         switch (loadCommand->cmd)
@@ -209,6 +221,9 @@ process_header(const uint64_t target_address, uint64_t *data_address, uint64_t *
 int64_t 
 find_sysent(const uint8_t *buffer, const uint64_t data_address, const uint64_t data_size)
 {
+#if DEBUG
+    printf("[DEBUG] Executing %s\n", __FUNCTION__);
+#endif
     uint64_t i = 0;
     if (get_kernel_type()) // 64 bits
     {

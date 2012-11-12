@@ -20,11 +20,10 @@
  *
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#ifndef _sysent_h_
+#define _sysent_h_
+
 #include <stdint.h>
-#include <mach-o/loader.h>
 
 // modified from the original because pointer sizes
 // not pretty but whatever!
@@ -78,15 +77,13 @@ struct descriptor_idt
 
 // prototypes 
 int8_t   verify_sysent(const uint32_t address);
-uint64_t calculate_int80address(const uint64_t idt_address);
+uint64_t calculate_int80address(const uint64_t idt_address, uint8_t kernel_type);
 uint8_t  process_header(const uint64_t target_address,
                        uint64_t *data_address,
                        uint64_t *data_size);
 int64_t  find_sysent(const uint8_t *buffer,
                     const uint64_t data_address,
                     const uint64_t data_size);
-uint64_t find_kernel_base(const uint64_t int80_address);
+uint64_t find_kernel_base(const uint64_t int80_address, uint8_t kernel_type);
 
-extern int8_t get_kernel_type (void);
-extern int8_t readkmem(const uint32_t fd, void *buffer,
-                     const uint64_t offset, const size_t size);
+#endif
