@@ -18,7 +18,7 @@
  *
  * A small util to bruteforce sysent address with a dynamic approach
  * It is very fast and appears to be very reliable, even from kernel
- * Why would love to know why it wasn't (publicly?) done before :-)
+ * I would love to know why it wasn't (publicly?) done before :-)
  *
  * (c) 2012, fG! - reverser@put.as - http://reverse.put.as
  *

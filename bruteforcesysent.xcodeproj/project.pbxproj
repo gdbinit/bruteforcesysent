@@ -25,6 +25,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		7B614AD916515E4B00A36B5D /* README.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
 		DE24DD0314E9BEA50071393F /* bruteforcesysent */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = bruteforcesysent; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE24DD0714E9BEA60071393F /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		DE24DD0F14E9BECE0071393F /* sysent.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sysent.c; sourceTree = "<group>"; };
@@ -47,6 +48,7 @@
 		DE24DCF814E9BEA50071393F = {
 			isa = PBXGroup;
 			children = (
+				7B614AD916515E4B00A36B5D /* README.md */,
 				DE24DD0614E9BEA50071393F /* bruteforcesysent */,
 				DE24DD0414E9BEA50071393F /* Products */,
 			);
