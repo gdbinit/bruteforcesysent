@@ -24,9 +24,33 @@
 #define _sysent_h_
 
 #include <stdint.h>
+#include <AvailabilityMacros.h>
 
+#ifdef MAC_OS_X_VERSION_10_9
 // modified from the original because pointer sizes
 // not pretty but whatever!
+struct sysent {		/* system call table */
+	uint32_t	*sy_call;	/* implementing function */
+	uint32_t	*sy_arg_munge32; /* system call arguments munger for 32-bit process */
+	uint32_t	*sy_arg_munge64; /* system call arguments munger for 64-bit process */
+	int32_t		sy_return_type; /* system call return types */
+	int16_t		sy_narg;	/* number of args */
+	uint16_t	sy_arg_bytes;	/* Total size of arguments in bytes for
+                                 * 32-bit system calls
+                                 */
+};
+
+struct sysent64 {		/* system call table */
+	uint64_t	*sy_call;	/* implementing function */
+	uint64_t	*sy_arg_munge32; /* system call arguments munger for 32-bit process */
+	uint64_t	*sy_arg_munge64; /* system call arguments munger for 64-bit process */
+	int32_t		sy_return_type; /* system call return types */
+	int16_t		sy_narg;	/* number of args */
+	uint16_t	sy_arg_bytes;	/* Total size of arguments in bytes for
+                                 * 32-bit system calls
+                                 */
+};
+#else
 struct sysent {		/* system call table */
 	int16_t		sy_narg;	/* number of args */
 	int8_t		sy_resv;	/* reserved  */
@@ -52,6 +76,8 @@ struct sysent64 {		/* system call table */
 								 * 32-bit system calls
 								 */
 };
+#endif
+
 
 // 16 bytes IDT descriptor, used for 32 and 64 bits kernels (64 bit capable cpus!)
 struct descriptor_idt
