@@ -20,7 +20,8 @@
  * It is very fast and appears to be very reliable, even from kernel
  * I would love to know why it wasn't (publicly?) done before :-)
  *
- * (c) 2012, fG! - reverser@put.as - http://reverse.put.as
+ * Copyright (c) 2012, 2013, 2014 fG! - reverser@put.as - http://reverse.put.as
+ * All rights reserved.
  *
  * Note: This requires kmem/mem devices to be enabled
  * Edit /Library/Preferences/SystemConfiguration/com.apple.Boot.plist
@@ -28,6 +29,29 @@
  *
  * v0.1 - Initial version, 32 and 64 bits support
  * v0.2 - Bug fixing and code cleanup
+ * v0.3 - Support for Mavericks or higher
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ * derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
 
@@ -40,7 +64,7 @@
 #include "idt.h"
 #include "sysent.h"
 
-#define VERSION "0.2"
+#define VERSION "0.3"
 
 int32_t fd_kmem;
 static void header(void);
@@ -49,9 +73,6 @@ int8_t readkmem(const uint32_t fd, void *buffer, const uint64_t offset, const si
 int8_t
 readkmem(const uint32_t fd, void *buffer, const uint64_t offset, const size_t size)
 {
-#if DEBUG
-    printf("[DEBUG] Executing %s\n", __FUNCTION__);
-#endif
 	if(lseek(fd, offset, SEEK_SET) != offset)
 	{
 		fprintf(stderr,"[ERROR] Error in lseek. Are you root? \n");
@@ -106,6 +127,7 @@ main(int argc, char ** argv)
 	    
 	// retrieve int80 address
     idt_t idt_address = get_addr_idt(kernel_type);
+    printf("[OK] IDT address: 0x%llx\n", idt_address);
     uint64_t int80_address = calculate_int80address(idt_address, kernel_type);
     
     uint64_t kernel_base = find_kernel_base(int80_address, kernel_type);

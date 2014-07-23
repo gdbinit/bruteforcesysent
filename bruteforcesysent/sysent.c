@@ -14,7 +14,30 @@
  *
  * Bruteforce Sysent
  *
- * (c) 2012, fG! - reverser@put.as - http://reverse.put.as
+ * Copyright (c) 2012, 2013, 2014 fG! - reverser@put.as - http://reverse.put.as
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ * derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * sysent.c
  *
@@ -33,9 +56,6 @@ extern int8_t readkmem(const uint32_t fd, void *buffer, const uint64_t offset, c
 uint64_t 
 calculate_int80address(const uint64_t idt_address, uint8_t kernel_type)
 {
-#if DEBUG
-    printf("[DEBUG] Executing %s\n", __FUNCTION__);
-#endif
   	// find the address of interrupt 0x80 - EXCEP64_SPC_USR(0x80,hi64_unix_scall) @ osfmk/i386/idt64.s
 	struct descriptor_idt *int80_descriptor = NULL;
 	uint64_t int80_address = 0;
@@ -66,9 +86,6 @@ calculate_int80address(const uint64_t idt_address, uint8_t kernel_type)
 uint64_t 
 find_kernel_base(const uint64_t int80_address, uint8_t kernel_type)
 {
-#if DEBUG
-    printf("[DEBUG] Executing %s\n", __FUNCTION__);
-#endif
     uint64_t temp_address   = int80_address;
     // the step amount to search backwards from int80
     uint16_t step_value     = 500; // step must be at least sizeof mach_header and a segment_command
@@ -148,9 +165,6 @@ find_kernel_base(const uint64_t int80_address, uint8_t kernel_type)
 uint8_t
 process_header(const uint64_t target_address, uint64_t *data_address, uint64_t *data_size)
 {
-#if DEBUG
-    printf("[DEBUG] Executing %s\n", __FUNCTION__);
-#endif
     uint8_t *header_buffer = malloc(1000);
     readkmem(fd_kmem, header_buffer, target_address, 1000);
     
@@ -195,7 +209,7 @@ process_header(const uint64_t target_address, uint64_t *data_address, uint64_t *
                 {
                     *data_address   = segmentCommand->vmaddr;
                     *data_size      = segmentCommand->vmsize;
-                    printf("[OK] Found __DATA segment at %p (size:0x%llx)!\n", (void*)*data_address, *data_size);
+                    printf("[OK] Found __DATA segment at %p (size:0x%llx)\n", (void*)*data_address, *data_size);
                 }
                 break;
             }
@@ -207,7 +221,7 @@ process_header(const uint64_t target_address, uint64_t *data_address, uint64_t *
                 {
                     *data_address   = segmentCommand->vmaddr;
                     *data_size      = segmentCommand->vmsize;
-                    printf("[OK] Found __DATA segment at %p (size:0x%llx)!\n", (void*)*data_address, *data_size);
+                    printf("[OK] Found __DATA segment at %p (size:0x%llx)\n", (void*)*data_address, *data_size);
                 }
                 break;
             }
@@ -221,28 +235,51 @@ process_header(const uint64_t target_address, uint64_t *data_address, uint64_t *
 int64_t 
 find_sysent(const uint8_t *buffer, const uint64_t data_address, const uint64_t data_size)
 {
-#if DEBUG
-    printf("[DEBUG] Executing %s\n", __FUNCTION__);
-#endif
     uint64_t i = 0;
     if (get_kernel_type()) // 64 bits
     {
-        while (i < data_size)
+        int major = get_kernel_version();
+
+        /* Mavericks or higher uses new sysent table format */
+        if (major >= 13)
         {
-            struct sysent64 *table = (struct sysent64*)(&buffer[i]);
-            if(table[SYS_exit].sy_narg      == 1 &&
-               table[SYS_fork].sy_narg      == 0 &&
-               table[SYS_read].sy_narg      == 3 &&
-               table[SYS_wait4].sy_narg     == 4 &&
-               table[SYS_ptrace].sy_narg    == 4 &&
-               table[SYS_getxattr].sy_narg  == 6 &&
-               table[SYS_listxattr].sy_narg == 4 &&
-               table[SYS_recvmsg].sy_narg   == 3 )
+            while (i < data_size)
             {
-                printf("[DEBUG] exit() address is %p\n", (void*)table[SYS_exit].sy_call);
-                return(data_address+i);
+                struct newsysent *table = (struct newsysent*)(&buffer[i]);
+                if(table[SYS_exit].sy_narg      == 1 &&
+                   table[SYS_fork].sy_narg      == 0 &&
+                   table[SYS_read].sy_narg      == 3 &&
+                   table[SYS_wait4].sy_narg     == 4 &&
+                   table[SYS_ptrace].sy_narg    == 4 &&
+                   table[SYS_getxattr].sy_narg  == 6 &&
+                   table[SYS_listxattr].sy_narg == 4 &&
+                   table[SYS_recvmsg].sy_narg   == 3 )
+                {
+                    printf("[DEBUG] exit() address is %p\n", (void*)table[SYS_exit].sy_call);
+                    return(data_address+i);
+                }
+                i++;
             }
-            i++;
+        }
+        else
+        {
+            while (i < data_size)
+            {
+                struct sysent64 *table = (struct sysent64*)(&buffer[i]);
+                if(table[SYS_exit].sy_narg      == 1 &&
+                   table[SYS_fork].sy_narg      == 0 &&
+                   table[SYS_read].sy_narg      == 3 &&
+                   table[SYS_wait4].sy_narg     == 4 &&
+                   table[SYS_ptrace].sy_narg    == 4 &&
+                   table[SYS_getxattr].sy_narg  == 6 &&
+                   table[SYS_listxattr].sy_narg == 4 &&
+                   table[SYS_recvmsg].sy_narg   == 3 )
+                {
+                    printf("[DEBUG] exit() address is %p\n", (void*)table[SYS_exit].sy_call);
+                    return(data_address+i);
+                }
+                i++;
+            }
         }
     }
     else // 32bits
