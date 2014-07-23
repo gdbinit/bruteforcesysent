@@ -40,7 +40,7 @@
 #include "idt.h"
 #include "sysent.h"
 
-#define VERSION "0.2"
+#define VERSION "0.3"
 
 int32_t fd_kmem;
 static void header(void);
