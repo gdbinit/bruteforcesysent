@@ -224,47 +224,89 @@ find_sysent(const uint8_t *buffer, const uint64_t data_address, const uint64_t d
 #if DEBUG
     printf("[DEBUG] Executing %s\n", __FUNCTION__);
 #endif
-    uint64_t i = 0;
-    if (get_kernel_type()) // 64 bits
-    {
-        while (i < data_size)
-        {
-            struct sysent64 *table = (struct sysent64*)(&buffer[i]);
-            if(table[SYS_exit].sy_narg      == 1 &&
-               table[SYS_fork].sy_narg      == 0 &&
-               table[SYS_read].sy_narg      == 3 &&
-               table[SYS_wait4].sy_narg     == 4 &&
-               table[SYS_ptrace].sy_narg    == 4 &&
-               table[SYS_getxattr].sy_narg  == 6 &&
-               table[SYS_listxattr].sy_narg == 4 &&
-               table[SYS_recvmsg].sy_narg   == 3 )
-            {
-                printf("[DEBUG] exit() address is %p\n", (void*)table[SYS_exit].sy_call);
-                return(data_address+i);
-            }
-            i++;
-        }
-    }
-    else // 32bits
-    {
-        while (i < data_size)
-        {
-            struct sysent *table = (struct sysent*)(&buffer[i]);
-            if(table[SYS_exit].sy_narg      == 1 &&
-               table[SYS_fork].sy_narg      == 0 &&
-               table[SYS_read].sy_narg      == 3 &&
-               table[SYS_wait4].sy_narg     == 4 &&
-               table[SYS_ptrace].sy_narg    == 4 &&
-               table[SYS_getxattr].sy_narg  == 6 &&
-               table[SYS_listxattr].sy_narg == 4 &&
-               table[SYS_recvmsg].sy_narg   == 3 )
-            {
-                printf("[DEBUG] exit() address is %p\n", (void*)table[SYS_exit].sy_call);
-                return(data_address+i);
-            }
-            i++;
-        }
-    }
+	uint64_t i = 0;
+	switch(get_kernel_type()) {
+		// i386 10.8-
+		case 0:
+			while (i < data_size)
+			{
+				struct sysent *table = (struct sysent*)(&buffer[i]);
+				if(table[SYS_exit].sy_narg      == 1 &&
+				   table[SYS_fork].sy_narg      == 0 &&
+				   table[SYS_read].sy_narg      == 3 &&
+				   table[SYS_wait4].sy_narg     == 4 &&
+				   table[SYS_ptrace].sy_narg    == 4 &&
+				   table[SYS_getxattr].sy_narg  == 6 &&
+				   table[SYS_listxattr].sy_narg == 4 &&
+				   table[SYS_recvmsg].sy_narg   == 3 )
+				{
+					printf("[DEBUG] exit() address is %p\n", (void*)table[SYS_exit].sy_call);
+					return(data_address+i);
+				}
+				i++;
+			}
+			break;
+		// x86  10.8-
+		case 1:
+			while (i < data_size)
+			{
+				struct sysent64 *table = (struct sysent64*)(&buffer[i]);
+				if(table[SYS_exit].sy_narg      == 1 &&
+				   table[SYS_fork].sy_narg      == 0 &&
+				   table[SYS_read].sy_narg      == 3 &&
+				   table[SYS_wait4].sy_narg     == 4 &&
+				   table[SYS_ptrace].sy_narg    == 4 &&
+				   table[SYS_getxattr].sy_narg  == 6 &&
+				   table[SYS_listxattr].sy_narg == 4 &&
+				   table[SYS_recvmsg].sy_narg   == 3 )
+				{
+					printf("[DEBUG] exit() address is %p\n", (void*)table[SYS_exit].sy_call);
+					return(data_address+i);
+				}
+				i++;
+			}
+			break;
+		// i386 10.9+
+		case 2:
+			while (i < data_size)
+			{
+				struct sysent_109 *table = (struct sysent_109*)(&buffer[i]);
+				if(table[SYS_exit].sy_narg      == 1 &&
+				   table[SYS_fork].sy_narg      == 0 &&
+				   table[SYS_read].sy_narg      == 3 &&
+				   table[SYS_wait4].sy_narg     == 4 &&
+				   table[SYS_ptrace].sy_narg    == 4 &&
+				   table[SYS_getxattr].sy_narg  == 6 &&
+				   table[SYS_listxattr].sy_narg == 4 &&
+				   table[SYS_recvmsg].sy_narg   == 3 )
+				{
+					printf("[DEBUG] exit() address is %p\n", (void*)table[SYS_exit].sy_call);
+					return(data_address+i);
+				}
+				i++;
+			}
+			break;
+		// x64  10.9+
+		case 3:
+			while (i < data_size)
+			{
+				struct sysent64_109 *table = (struct sysent64_109*)(&buffer[i]);
+				if(table[SYS_exit].sy_narg      == 1 &&
+				   table[SYS_fork].sy_narg      == 0 &&
+				   table[SYS_read].sy_narg      == 3 &&
+				   table[SYS_wait4].sy_narg     == 4 &&
+				   table[SYS_ptrace].sy_narg    == 4 &&
+				   table[SYS_getxattr].sy_narg  == 6 &&
+				   table[SYS_listxattr].sy_narg == 4 &&
+				   table[SYS_recvmsg].sy_narg   == 3 )
+				{
+					printf("[DEBUG] exit() address is %p\n", (void*)table[SYS_exit].sy_call);
+					return(data_address+i);
+				}
+				i++;
+			}
+			break;
+	}
     return(0);
 }
 

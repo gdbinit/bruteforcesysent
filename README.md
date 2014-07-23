@@ -18,7 +18,7 @@ Bruteforce Sysent
 
 A small util to bruteforce sysent address with a dynamic approach
 It is very fast and appears to be very reliable, even from kernel.
-Compatible with OS X 10.6, 10.7 and 10.8.
+Compatible with OS X 10.6, 10.7, 10.8 and 10.9.
 
 (c) 2012, fG! - reverser@put.as - http://reverse.put.as
 
