@@ -76,11 +76,20 @@ struct sysent64 {		/* system call table */
                                  */
 };
 
-/* Sysent table format used by Mavericks or higher ... */
-struct newsysent {
-    uint64_t    *sy_call;
-    uint64_t    *sy_arg_munge32;
-    uint64_t    *sy_arg_munge64;
+/* Sysent table format used by Mavericks */
+struct sysent_mav {
+    uint64_t    *sy_call;        /* this is originally sy_call_t but doesn't matter here */
+    uint64_t    *sy_arg_munge32; /* original sy_munge_t */
+    uint64_t    *sy_arg_munge64; /* original sy_munge_t */
+    int32_t     sy_return_type;
+    int16_t     sy_narg;
+    uint16_t    sy_arg_bytes;
+};
+
+/* Yosemite sysent structure is something like this */
+struct sysent_yosemite {
+    uint64_t   *sy_call;        /* this is originally sy_call_t but doesn't matter here */
+    uint64_t   *sy_arg_munge64; /* original sy_munge_t */
     int32_t     sy_return_type;
     int16_t     sy_narg;
     uint16_t    sy_arg_bytes;

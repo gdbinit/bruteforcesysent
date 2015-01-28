@@ -239,13 +239,13 @@ find_sysent(const uint8_t *buffer, const uint64_t data_address, const uint64_t d
     if (get_kernel_type()) // 64 bits
     {
         int major = get_kernel_version();
-        
-        /* Mavericks or higher uses new sysent table format */
-        if (major >= 13)
+
+        /* Yosemite */
+        if (major == 14)
         {
             while (i < data_size)
             {
-                struct newsysent *table = (struct newsysent*)(&buffer[i]);
+                struct sysent_yosemite *table = (struct sysent_yosemite*)(&buffer[i]);
                 if(table[SYS_exit].sy_narg      == 1 &&
                    table[SYS_fork].sy_narg      == 0 &&
                    table[SYS_read].sy_narg      == 3 &&
@@ -261,6 +261,28 @@ find_sysent(const uint8_t *buffer, const uint64_t data_address, const uint64_t d
                 i++;
             }
         }
+        /* Mavericks */
+        else if (major == 13)
+        {
+            while (i < data_size)
+            {
+                struct sysent_mav *table = (struct sysent_mav*)(&buffer[i]);
+                if(table[SYS_exit].sy_narg      == 1 &&
+                   table[SYS_fork].sy_narg      == 0 &&
+                   table[SYS_read].sy_narg      == 3 &&
+                   table[SYS_wait4].sy_narg     == 4 &&
+                   table[SYS_ptrace].sy_narg    == 4 &&
+                   table[SYS_getxattr].sy_narg  == 6 &&
+                   table[SYS_listxattr].sy_narg == 4 &&
+                   table[SYS_recvmsg].sy_narg   == 3 )
+                {
+                    printf("[DEBUG] exit() address is %p\n", (void*)table[SYS_exit].sy_call);
+                    return(data_address+i);
+                }
+                i++;
+            }
+        }
+        /* Older versions all use the same structure */
         else
         {
             while (i < data_size)
