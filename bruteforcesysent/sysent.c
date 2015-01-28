@@ -1,16 +1,16 @@
 /*
- *     _____                                    
- *  __|___  |__  _____   __   _    __    ______ 
+ *     _____
+ *  __|___  |__  _____   __   _    __    ______
  * |      >    ||     | |  | | | _|  |_ |   ___|
  * |     <     ||     \ |  |_| ||_    _||   ___|
  * |______>  __||__|\__\|______|  |__|  |______|
- *    |_____|                                   
- *     _____                                    
- *  __|___  |__  _____  _____   ______  ______  
- * |   ___|    |/     \|     | |   ___||   ___| 
- * |   ___|    ||     ||     \ |   |__ |   ___| 
- * |___|     __|\_____/|__|\__\|______||______| 
- *    |_____|    
+ *    |_____|
+ *     _____
+ *  __|___  |__  _____  _____   ______  ______
+ * |   ___|    |/     \|     | |   ___||   ___|
+ * |   ___|    ||     ||     \ |   |__ |   ___|
+ * |___|     __|\_____/|__|\__\|______||______|
+ *    |_____|
  *
  * Bruteforce Sysent
  *
@@ -53,37 +53,37 @@
 extern int32_t fd_kmem;
 extern int8_t readkmem(const uint32_t fd, void *buffer, const uint64_t offset, const size_t size);
 
-uint64_t 
+uint64_t
 calculate_int80address(const uint64_t idt_address, uint8_t kernel_type)
 {
-  	// find the address of interrupt 0x80 - EXCEP64_SPC_USR(0x80,hi64_unix_scall) @ osfmk/i386/idt64.s
-	struct descriptor_idt *int80_descriptor = NULL;
-	uint64_t int80_address = 0;
-	uint64_t high       = 0;
+    // find the address of interrupt 0x80 - EXCEP64_SPC_USR(0x80,hi64_unix_scall) @ osfmk/i386/idt64.s
+    struct descriptor_idt *int80_descriptor = NULL;
+    uint64_t int80_address = 0;
+    uint64_t high       = 0;
     uint32_t middle     = 0;
-
-	int80_descriptor = malloc(sizeof(struct descriptor_idt));
-	// retrieve the descriptor for interrupt 0x80
+    
+    int80_descriptor = malloc(sizeof(struct descriptor_idt));
+    // retrieve the descriptor for interrupt 0x80
     // the IDT is an array of descriptors
-	readkmem(fd_kmem, int80_descriptor, idt_address+sizeof(struct descriptor_idt)*0x80, sizeof(struct descriptor_idt));
-
+    readkmem(fd_kmem, int80_descriptor, idt_address+sizeof(struct descriptor_idt)*0x80, sizeof(struct descriptor_idt));
+    
     // we need to compute the address, it's not direct
     if (kernel_type)
     {
         // extract the stub address
         high = (unsigned long)int80_descriptor->offset_high << 32;
         middle = (unsigned int)int80_descriptor->offset_middle << 16;
-        int80_address = (uint64_t)(high + middle + int80_descriptor->offset_low); 
+        int80_address = (uint64_t)(high + middle + int80_descriptor->offset_low);
     }
     else
     {
         int80_address = (uint32_t)(int80_descriptor->offset_middle << 16) + int80_descriptor->offset_low;
     }
-	printf("[OK] Address of interrupt 80 stub is %p\n", (void*)int80_address);  
+    printf("[OK] Address of interrupt 80 stub is %p\n", (void*)int80_address);
     return(int80_address);
 }
 
-uint64_t 
+uint64_t
 find_kernel_base(const uint64_t int80_address, uint8_t kernel_type)
 {
     uint64_t temp_address   = int80_address;
@@ -91,7 +91,7 @@ find_kernel_base(const uint64_t int80_address, uint8_t kernel_type)
     uint16_t step_value     = 500; // step must be at least sizeof mach_header and a segment_command
     uint16_t length         = step_value;
     uint8_t *temp_buffer    = malloc(step_value);
-
+    
     if (kernel_type) // 64bits
     {
         struct segment_command_64 *segment_command = NULL;
@@ -117,21 +117,21 @@ find_kernel_base(const uint64_t int80_address, uint8_t kernel_type)
             while(readkmem(fd_kmem, temp_buffer, temp_address-step_value, length) == -2)
             {
                 step_value = 1; // we could find out which is the biggest acceptable value
-                                // but it seems like a waste of time - I'm an Economist :P
-                                // we can read smaller values to avoid overlapping
+                // but it seems like a waste of time - I'm an Economist :P
+                // we can read smaller values to avoid overlapping
                 length = sizeof(struct mach_header_64) + sizeof(struct segment_command_64);
             }
             // check for int overflow
             if (temp_address - step_value > temp_address)
                 break;
             temp_address -= step_value;
-        }           
+        }
     }
     else // 32bits
     {
         struct segment_command *segment_command = NULL;
         while (temp_address > 0)
-        {   
+        {
             readkmem(fd_kmem, temp_buffer, temp_address, length);
             for (uint32_t x = 0; x < length; x++)
             {
@@ -158,7 +158,7 @@ find_kernel_base(const uint64_t int80_address, uint8_t kernel_type)
     }
     return(0);
 }
-/* 
+/*
  * process target kernel module header and retrieve some info we need
  */
 
@@ -174,16 +174,16 @@ process_header(const uint64_t target_address, uint64_t *data_address, uint64_t *
     
     uint32_t magic = *(uint32_t*)(header_buffer);
     if (magic == MH_MAGIC)
-	{
+    {
         struct mach_header *machHeader = (struct mach_header*)(header_buffer);
-        nrLoadCmds = machHeader->ncmds;        
+        nrLoadCmds = machHeader->ncmds;
         // first load cmd address
         address = (uint8_t*)(header_buffer + sizeof(struct mach_header));
-	}
+    }
     else if (magic == MH_MAGIC_64)
     {
         struct mach_header_64 *machHeader = (struct mach_header_64*)(header_buffer);
-        nrLoadCmds = machHeader->ncmds;        
+        nrLoadCmds = machHeader->ncmds;
         // first load cmd address
         address = (uint8_t*)(header_buffer + sizeof(struct mach_header_64));
     }
@@ -232,14 +232,14 @@ process_header(const uint64_t target_address, uint64_t *data_address, uint64_t *
     return 0;
 }
 
-int64_t 
+int64_t
 find_sysent(const uint8_t *buffer, const uint64_t data_address, const uint64_t data_size)
 {
     uint64_t i = 0;
     if (get_kernel_type()) // 64 bits
     {
         int major = get_kernel_version();
-
+        
         /* Mavericks or higher uses new sysent table format */
         if (major >= 13)
         {

@@ -1,16 +1,16 @@
 /*
- *     _____                                    
- *  __|___  |__  _____   __   _    __    ______ 
+ *     _____
+ *  __|___  |__  _____   __   _    __    ______
  * |      >    ||     | |  | | | _|  |_ |   ___|
  * |     <     ||     \ |  |_| ||_    _||   ___|
  * |______>  __||__|\__\|______|  |__|  |______|
- *    |_____|                                   
- *     _____                                    
- *  __|___  |__  _____  _____   ______  ______  
- * |   ___|    |/     \|     | |   ___||   ___| 
- * |   ___|    ||     ||     \ |   |__ |   ___| 
- * |___|     __|\_____/|__|\__\|______||______| 
- *    |_____|    
+ *    |_____|
+ *     _____
+ *  __|___  |__  _____  _____   ______  ______
+ * |   ___|    |/     \|     | |   ___||   ___|
+ * |   ___|    ||     ||     \ |   |__ |   ___|
+ * |___|     __|\_____/|__|\__\|______||______|
+ *    |_____|
  *
  * Bruteforce Sysent
  *
@@ -54,43 +54,43 @@
 idt_t
 get_addr_idt (uint8_t kernel_type)
 {
-	// allocate enough space for 32 and 64 bits addresses
-	uint8_t idtr[10];
-	idt_t idt = 0;
+    // allocate enough space for 32 and 64 bits addresses
+    uint8_t idtr[10];
+    idt_t idt = 0;
     
-	__asm__ volatile ("sidt %0": "=m" (idtr));
-	switch (kernel_type) {
-		case 0:
-			idt = *((uint32_t *) &idtr[2]);
-			break;
-		case 1:
-			idt = *((uint64_t *) &idtr[2]);
-			break;
-		default:
+    __asm__ volatile ("sidt %0": "=m" (idtr));
+    switch (kernel_type) {
+        case 0:
+            idt = *((uint32_t *) &idtr[2]);
+            break;
+        case 1:
+            idt = *((uint64_t *) &idtr[2]);
+            break;
+        default:
             idt = 0;
-			break;
-	}
-	return(idt);
+            break;
+    }
+    return(idt);
 }
 
 // retrieve which kernel type are we running, 32 or 64 bits
 int8_t
 get_kernel_type (void)
 {
-	size_t size = 0;
+    size_t size = 0;
     
-	if ( sysctlbyname("hw.machine", NULL, &size, NULL, 0) )
+    if ( sysctlbyname("hw.machine", NULL, &size, NULL, 0) )
     {
         printf("[ERROR] Failed to get hw.machine size.\n");
         return -1;
     }
-	char *machine = malloc(size);
+    char *machine = malloc(size);
     if (machine == NULL)
     {
         printf("[ERROR] Failed to allocate memory.\n");
         return -1;
     }
-	
+    
     if ( sysctlbyname("hw.machine", machine, &size, NULL, 0) )
     {
         printf("[ERROR] Failed to get hw.machine.\n");
@@ -100,13 +100,13 @@ get_kernel_type (void)
     
     int8_t retValue = -1;
     
-	if (strcmp(machine, "i386") == 0)
+    if (strcmp(machine, "i386") == 0)
     {
-		retValue = 0;
+        retValue = 0;
     }
-	else if (strcmp(machine, "x86_64") == 0)
+    else if (strcmp(machine, "x86_64") == 0)
     {
-		retValue = 1;
+        retValue = 1;
     }
     
     free(machine);
@@ -116,19 +116,19 @@ get_kernel_type (void)
 int
 get_kernel_version(void)
 {
-	size_t size = 0;
-	if ( sysctlbyname("kern.osrelease", NULL, &size, NULL, 0) )
+    size_t size = 0;
+    if ( sysctlbyname("kern.osrelease", NULL, &size, NULL, 0) )
     {
         printf("[ERROR] Failed to get kern.osrelease size.\n");
         return -1;
     }
-	char *osrelease = malloc(size);
+    char *osrelease = malloc(size);
     if (osrelease == NULL)
     {
         printf("[ERROR] Failed to allocate memory.\n");
         return -1;
     }
-	if ( sysctlbyname("kern.osrelease", osrelease, &size, NULL, 0) )
+    if ( sysctlbyname("kern.osrelease", osrelease, &size, NULL, 0) )
     {
         printf("[ERROR] Failed to get kern.osrelease.\n");
         free(osrelease);

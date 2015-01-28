@@ -1,16 +1,16 @@
 /*
- *     _____                                    
- *  __|___  |__  _____   __   _    __    ______ 
+ *     _____
+ *  __|___  |__  _____   __   _    __    ______
  * |      >    ||     | |  | | | _|  |_ |   ___|
  * |     <     ||     \ |  |_| ||_    _||   ___|
  * |______>  __||__|\__\|______|  |__|  |______|
- *    |_____|                                   
- *     _____                                    
- *  __|___  |__  _____  _____   ______  ______  
- * |   ___|    |/     \|     | |   ___||   ___| 
- * |   ___|    ||     ||     \ |   |__ |   ___| 
- * |___|     __|\_____/|__|\__\|______||______| 
- *    |_____|    
+ *    |_____|
+ *     _____
+ *  __|___  |__  _____  _____   ______  ______
+ * |   ___|    |/     \|     | |   ___||   ___|
+ * |   ___|    ||     ||     \ |   |__ |   ___|
+ * |___|     __|\_____/|__|\__\|______||______|
+ *    |_____|
  *
  * (Yes, I love asciiz, I'm old skweeellll :P !!!)
  *
@@ -73,17 +73,17 @@ int8_t readkmem(const uint32_t fd, void *buffer, const uint64_t offset, const si
 int8_t
 readkmem(const uint32_t fd, void *buffer, const uint64_t offset, const size_t size)
 {
-	if(lseek(fd, offset, SEEK_SET) != offset)
-	{
-		fprintf(stderr,"[ERROR] Error in lseek. Are you root? \n");
-		return(-1);
-	}
+    if(lseek(fd, offset, SEEK_SET) != offset)
+    {
+        fprintf(stderr,"[ERROR] Error in lseek. Are you root? \n");
+        return(-1);
+    }
     ssize_t bytes_read = read(fd, buffer, size);
-	if(bytes_read != size)
-	{
-		fprintf(stderr,"[ERROR] Error while trying to read from kmem. Asked %ld bytes from offset %llx, returned %ld.\n", size, offset, bytes_read);
-		return(-2);
-	}
+    if(bytes_read != size)
+    {
+        fprintf(stderr,"[ERROR] Error while trying to read from kmem. Asked %ld bytes from offset %llx, returned %ld.\n", size, offset, bytes_read);
+        return(-2);
+    }
     return(0);
 }
 
@@ -94,38 +94,38 @@ header(void)
     printf("| __  |___ _ _| |_ ___|   __|___ ___ ___ ___ \n");
     printf("| __ -|  _| | |  _| -_|   __| . |  _|  _| -_|\n");
     printf("|_____|_| |___|_| |___|__|  |___|_| |___|___|\n");
-	printf("   Bruteforce sysent address v%s - (c) fG!\n",VERSION);
-	printf("---------------------------------------------\n");
+    printf("   Bruteforce sysent address v%s - (c) fG!\n",VERSION);
+    printf("---------------------------------------------\n");
 }
 
 int
 main(int argc, char ** argv)
 {
-    	
-	header();
-    	
-	// we need to run this as root
-	if (getuid() != 0)
-	{
-		printf("[ERROR] Please run me as root!\n");
-		exit(1);
-	}
-	
-	int8_t kernel_type = get_kernel_type();
-	if (kernel_type == -1)
-	{
-		printf("[ERROR] Unable to retrieve kernel type!\n");
-		exit(1);
-	}
-	
-	if((fd_kmem = open("/dev/kmem",O_RDWR)) == -1)
-	{
-		fprintf(stderr,"[ERROR] Error while opening /dev/kmem. Is /dev/kmem enabled?\n");
-		fprintf(stderr,"Add parameter kmem=1 to /Library/Preferences/SystemConfiguration/com.apple.Boot.plist\n");
-		exit(1);
-	}
-	    
-	// retrieve int80 address
+    
+    header();
+    
+    // we need to run this as root
+    if (getuid() != 0)
+    {
+        printf("[ERROR] Please run me as root!\n");
+        exit(1);
+    }
+    
+    int8_t kernel_type = get_kernel_type();
+    if (kernel_type == -1)
+    {
+        printf("[ERROR] Unable to retrieve kernel type!\n");
+        exit(1);
+    }
+    
+    if((fd_kmem = open("/dev/kmem",O_RDWR)) == -1)
+    {
+        fprintf(stderr,"[ERROR] Error while opening /dev/kmem. Is /dev/kmem enabled?\n");
+        fprintf(stderr,"Add parameter kmem=1 to /Library/Preferences/SystemConfiguration/com.apple.Boot.plist\n");
+        exit(1);
+    }
+    
+    // retrieve int80 address
     idt_t idt_address = get_addr_idt(kernel_type);
     printf("[OK] IDT address: 0x%llx\n", idt_address);
     uint64_t int80_address = calculate_int80address(idt_address, kernel_type);
@@ -142,13 +142,13 @@ main(int argc, char ** argv)
     process_header(kernel_base, &data_address, &data_size);
     
     uint8_t *read = malloc((size_t)data_size);
-	if (read == NULL)
+    if (read == NULL)
     {
         printf("[ERROR] Memory allocation failed!\n");
         exit(1);
     }
-
-	// read kernel memory and find sysent
+    
+    // read kernel memory and find sysent
     readkmem(fd_kmem, read, data_address, (size_t)data_size);
     uint64_t sysent_address = find_sysent(read, data_address, data_size);
     
@@ -160,7 +160,7 @@ main(int argc, char ** argv)
     {
         printf("[ERROR] Could not found sysent address!\n");
     }
-
+    
     free(read);
-	return 0;
+    return 0;
 }
