@@ -29,7 +29,8 @@
  *
  * v0.1 - Initial version, 32 and 64 bits support
  * v0.2 - Bug fixing and code cleanup
- * v0.3 - Support for Mavericks or higher
+ * v0.3 - Mavericks support
+ * v0.4 - Yosemite support, remove 32 bits support
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -61,10 +62,11 @@
 #include <fcntl.h>
 #include <string.h>
 #include <stdint.h>
+#include <mach/mach.h>
 #include "idt.h"
 #include "sysent.h"
 
-#define VERSION "0.3"
+#define VERSION "0.4"
 
 int32_t fd_kmem;
 static void header(void);
@@ -76,15 +78,15 @@ readkmem(const uint32_t fd, void *buffer, const uint64_t offset, const size_t si
     if(lseek(fd, offset, SEEK_SET) != offset)
     {
         fprintf(stderr,"[ERROR] Error in lseek. Are you root? \n");
-        return(-1);
+        return -1;
     }
     ssize_t bytes_read = read(fd, buffer, size);
     if(bytes_read != size)
     {
         fprintf(stderr,"[ERROR] Error while trying to read from kmem. Asked %ld bytes from offset %llx, returned %ld.\n", size, offset, bytes_read);
-        return(-2);
+        return -2;
     }
-    return(0);
+    return 0;
 }
 
 static void
@@ -101,57 +103,70 @@ header(void)
 int
 main(int argc, char ** argv)
 {
-    
     header();
     
     // we need to run this as root
     if (getuid() != 0)
     {
         printf("[ERROR] Please run me as root!\n");
-        exit(1);
+        return EXIT_FAILURE;
     }
     
     int8_t kernel_type = get_kernel_type();
     if (kernel_type == -1)
     {
         printf("[ERROR] Unable to retrieve kernel type!\n");
-        exit(1);
+        return EXIT_FAILURE;
+    }
+    if (kernel_type == 0)
+    {
+        printf("[ERROR] 32 bits kernel not supported!\n");
+        return EXIT_FAILURE;
     }
     
     if((fd_kmem = open("/dev/kmem",O_RDWR)) == -1)
     {
         fprintf(stderr,"[ERROR] Error while opening /dev/kmem. Is /dev/kmem enabled?\n");
         fprintf(stderr,"Add parameter kmem=1 to /Library/Preferences/SystemConfiguration/com.apple.Boot.plist\n");
-        exit(1);
+        return EXIT_FAILURE;
     }
     
     // retrieve int80 address
     idt_t idt_address = get_addr_idt(kernel_type);
     printf("[OK] IDT address: 0x%llx\n", idt_address);
-    uint64_t int80_address = calculate_int80address(idt_address, kernel_type);
+    mach_vm_address_t int80_address = calculate_int80address(idt_address, kernel_type);
     
-    uint64_t kernel_base = find_kernel_base(int80_address, kernel_type);
+    mach_vm_address_t kernel_base = find_kernel_base(int80_address, kernel_type);
     if (kernel_base == 0)
     {
         fprintf(stderr, "[ERROR] Could not find kernel base address!\n");
-        exit(1);
+        return EXIT_FAILURE;
     }
     uint64_t data_address = 0;
     uint64_t data_size    = 0;
     
-    process_header(kernel_base, &data_address, &data_size);
+    if (process_header(kernel_base, &data_address, &data_size) != 0)
+    {
+        printf("[ERROR] Failed to process kernel mach-o header.\n");
+        return EXIT_FAILURE;
+    }
     
-    uint8_t *read = malloc((size_t)data_size);
-    if (read == NULL)
+    uint8_t *kernel_buf = malloc((size_t)data_size);
+    if (kernel_buf == NULL)
     {
         printf("[ERROR] Memory allocation failed!\n");
-        exit(1);
+        return EXIT_FAILURE;
     }
     
     // read kernel memory and find sysent
-    readkmem(fd_kmem, read, data_address, (size_t)data_size);
-    uint64_t sysent_address = find_sysent(read, data_address, data_size);
+    if (readkmem(fd_kmem, kernel_buf, data_address, (size_t)data_size) != 0)
+    {
+        printf("[ERROR] Failed to read kernel __DATA segment memory.\n");
+        free(kernel_buf);
+        return EXIT_FAILURE;
+    }
     
+    mach_vm_address_t sysent_address = find_sysent(kernel_buf, data_address, data_size);
     if (sysent_address)
     {
         printf("[OK] Found sysent address at %p\n",(void*)sysent_address);
@@ -161,6 +176,6 @@ main(int argc, char ** argv)
         printf("[ERROR] Could not found sysent address!\n");
     }
     
-    free(read);
-    return 0;
+    free(kernel_buf);
+    return EXIT_SUCCESS;
 }

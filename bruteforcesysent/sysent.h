@@ -119,13 +119,13 @@ struct descriptor_idt
 
 // prototypes
 int8_t   verify_sysent(const uint32_t address);
-uint64_t calculate_int80address(const uint64_t idt_address, uint8_t kernel_type);
-uint8_t  process_header(const uint64_t target_address,
+mach_vm_address_t calculate_int80address(const uint64_t idt_address, uint8_t kernel_type);
+int process_header(const uint64_t target_address,
                         uint64_t *data_address,
                         uint64_t *data_size);
-int64_t  find_sysent(const uint8_t *buffer,
+mach_vm_address_t  find_sysent(const uint8_t *buffer,
                      const uint64_t data_address,
                      const uint64_t data_size);
-uint64_t find_kernel_base(const uint64_t int80_address, uint8_t kernel_type);
+mach_vm_address_t find_kernel_base(const uint64_t int80_address, uint8_t kernel_type);
 
 #endif
