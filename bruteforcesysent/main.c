@@ -124,7 +124,7 @@ main(int argc, char ** argv)
         return EXIT_FAILURE;
     }
     
-    if((fd_kmem = open("/dev/kmem",O_RDWR)) == -1)
+    if((fd_kmem = open("/dev/kmem",O_RDONLY)) == -1)
     {
         fprintf(stderr,"[ERROR] Error while opening /dev/kmem. Is /dev/kmem enabled?\n");
         fprintf(stderr,"Add parameter kmem=1 to /Library/Preferences/SystemConfiguration/com.apple.Boot.plist\n");
